@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>GDSS Azare Result Portal</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#0b4ea2,#1fa463);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container{
+  background:#fff;
+  width:350px;
+  padding:25px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.3);
+  text-align:center;
+}
+
+h2{
+  margin-bottom:20px;
+  color:#0b4ea2;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-bottom:15px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button{
+  width:100%;
+  padding:10px;
+  background:#0b4ea2;
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+button:hover{
+  background:#083b7c;
+}
+
+.result-box{
+  margin-top:20px;
+  text-align:left;
+}
+.result-box p{
+  margin:5px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>🎓 Check Your Result</h2>
+  <input type="text" id="studentID" placeholder="Enter Student ID (STU001)">
+  <button onclick="checkResult()">Check Result</button>
+  <div class="result-box" id="result"></div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+// 🔥 REAL FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyBV2r5m0FFh246l6m9z5dL5-biKJoO1otY",
+  authDomain: "gdss-azare-system.firebaseapp.com",
+  projectId: "gdss-azare-system",
+  storageBucket: "gdss-azare-system.firebasestorage.app",
+  messagingSenderId: "898059869768",
+  appId: "1:898059869768:web:d2069fb7a49bded655827d"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.checkResult = async function(){
+
+  const id = document.getElementById("studentID").value.trim();
+  const resultDiv = document.getElementById("result");
+
+  if(!id){
+    resultDiv.innerHTML = "<p style='color:red;'>Enter Student ID</p>";
+    return;
+  }
+
+  const docRef = doc(db, "students", id);
+  const docSnap = await getDoc(docRef);
+
+  if(docSnap.exists()){
+    const data = docSnap.data();
+
+    resultDiv.innerHTML = `
+      <h3>${data.fullName || ""}</h3>
+      <p>Class: ${data.class || ""}</p>
+      <hr>
+      <p>Math: ${data.math || 0}</p>
+      <p>English: ${data.english || 0}</p>
+      <p>Biology: ${data.Biology || 0}</p>
+      <p>Chemistry: ${data.Chemistry || 0}</p>
+      <p>Physics: ${data.physics || 0}</p>
+    `;
+
+  } else {
+    resultDiv.innerHTML = "<p style='color:red;'>Student Not Found</p>";
+  }
+}
+
+</script>
+
+</body>
+    </html>
